@@ -1,0 +1,19 @@
+name: Publish viewer update
+on:
+  push:
+    paths:
+      - Vital-Viewer-App-Update.json
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish app update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v$(jq -er '.version | select(test("^[0-9]+[.][0-9]+[.][0-9]+$"))' Vital-Viewer-App-Update.json)"
+          gh release create "$tag" Vital-Viewer-App-Update.json --target "$GITHUB_SHA" --title "Vital Replay Viewer $tag" --notes "Install this app update with Viewer → Check for updates."
